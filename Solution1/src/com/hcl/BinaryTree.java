@@ -1,0 +1,92 @@
+package com.hcl;
+
+import java.util.Stack;
+
+public class BinaryTree {
+	Node root;
+	
+	public BinaryTree() {
+		this.root = null;
+	}
+	
+	//Insert nodes into the tree.
+	public void insert(int ele) {
+		Node t = new Node();
+		t.setLeft(null);
+		t.setData(ele);
+		t.setRight(null);
+		
+		if(root == null) {
+			root = t;
+		} else {
+			Node current = root;
+			
+			while(current != null) {
+				if(ele == current.getData()) {
+					System.out.println("Duplicate values.");
+				}
+				
+				if(ele < current.getData()) {
+					if(current.getLeft() == null) {
+						current.setLeft(t);
+						return;
+					} else {
+						current = current.getLeft();
+					}
+				} else {
+					if(current.getRight() == null) {
+						current.setRight(t);
+						return;
+					} else {
+						current = current.getRight();
+					}
+				}
+			}
+		}
+	}
+	
+	// Print leaf nodes from right to left.
+	public void printRightToLeft(Node root) {
+		Stack<Node> s = new Stack<>();  
+		  
+        while (true)  
+        {  
+            if (root != null)  
+            {  
+                s.push(root);  
+                root = root.getRight();  
+            }  
+  
+            else 
+            {  
+                if (s.empty())  
+                    break;  
+                else
+                {  
+                    if (s.peek().getLeft() == null)  
+                    {  
+                        root = s.peek();  
+                        s.pop();  
+  
+                        if (root.getRight() == null)  
+                            System.out.print( root.getData()+" ");  
+                    }  
+  
+                    while (root == s.peek().getLeft())  
+                    {  
+                        root = s.peek();  
+                        s.pop();  
+  
+                        if (s.empty())  
+                            break;  
+                    }  
+  
+                    if (!s.empty())  
+                        root = s.peek().getLeft();  
+                    else
+                        root = null;  
+                }  
+            }
+        }
+	}
+}

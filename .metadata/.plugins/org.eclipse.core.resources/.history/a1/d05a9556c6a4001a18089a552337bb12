@@ -1,0 +1,68 @@
+package com.hcl.sftpServer.utility;
+
+import java.sql.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.company.sftpServer.model.csvModel;
+
+public class csvObjToDatabase {
+	private static Connection CONNECTION = null;
+	private static Statement STATEMENT = null;
+	
+	static{
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			CONNECTION=DriverManager.getConnection("jdbc:mysql://localhost:3306/csvdatabase",
+													"USERNAME",
+													"PASSWORD");
+			STATEMENT = CONNECTION.createStatement();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			try{
+				if(!(CONNECTION==null)) CONNECTION.close();
+				if(!(STATEMENT==null)) STATEMENT.close();
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	public static int[] csvObjToMysqlDB(List<csvModel> csvObjList)throws Exception{
+		
+		for(csvModel obj: csvObjList){
+			HashMap<String, String> SQLQUERY_VAR= (HashMap<String, String>) sqlQueryGen(obj);
+			String  SQL = SQLQUERY_VAR.keySet().iterator().next();
+			SQL=SQLQUERY_VAR.get(SQL);
+			
+			STATEMENT.addBatch(SQL);
+		}
+		
+		int[] DATAFLUSH = STATEMENT.executeBatch();
+		
+		try{
+			if(!(CONNECTION==null)) CONNECTION.close();
+			if(!(STATEMENT==null)) STATEMENT.close();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
+		return DATAFLUSH;
+	}
+	
+	public static Map<String,String> sqlQueryGen(Object objCSV){
+		csvModel obj= (csvModel)objCSV;
+		int flag = 0;
+		String SQLQUERY = "insert into CSVTABLE values(' "+obj.getRESULT_TIME()+ "'" +
+													      +obj.getGRANUALIRITY_PERIOD()+
+													   "'"+obj.getOBJECT_NAME()+"'"+
+													      +obj.getCELL_ID()+
+													      +obj.getCALL_ATTEMPT()+ ");" ;
+		String VARIABLE="SQLQUERY"+flag++;
+		HashMap<String,String> MAP=new HashMap<String,String>();
+		MAP.put(VARIABLE, SQLQUERY);
+		return MAP;
+	}
+}
